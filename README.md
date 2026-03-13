@@ -1,28 +1,46 @@
-# Quantos Developer Tools Landing Page
+# Quantos - Developer Tools - Test task
 
-Containerized Express backend with Elasticsearch for a developer tools landing page.
+## Project Structure
 
-## Quick Start
+- **backend/**: Express 5 + TypeScript API server (port 3001)
+- **frontend/**: Vue 3 + Vuetify 3 + Vite SPA (port 3000 dev)
+- **docker-compose.yml**: Orchestrates Elasticsearch, backend, frontend
 
-```bash
-docker-compose up
-```
+## Commands
 
-Backend runs on `http://localhost:3001`, Elasticsearch on `http://localhost:9200`.
-
-### Local Development (without Docker)
+**Docker:**
 
 ```bash
-# Start Elasticsearch separately, then:
-cd backend
-npm install
-npm run dev
+docker-compose up        # Start all services (ES on 9200, backend on 3001, frontend on 3000)
 ```
 
-## Default Credentials
+**Backend Development (from `/backend/`):**
 
-- Username: `admin`
-- Password: `admin123`
+```bash
+npm install              # Install dependencies
+npm run dev              # Start dev server with tsx watch (port 3001)
+npm run build            # Build with tsup to dist/
+npm run start            # Run production build
+npm run test             # Run tests (node --test)
+npm run test:watch       # Run tests in watch mode
+```
+
+**Frontend Development (from `/frontend/`):**
+
+```bash
+npm install              # Install dependencies
+npm run dev              # Start Vite dev server (port 3000)
+npm run build            # Type-check + Vite production build
+npm run preview          # Preview production build
+```
+
+## Architecture
+
+- **Backend**: Express 5, TypeScript (ES modules), JWT auth (bcrypt), Elasticsearch 8.13 client
+- **Frontend**: Vue 3, Vuetify 3, Pinia stores, Vue Router, Axios HTTP client
+- **Database**: Elasticsearch 8.13.2 (single-node, security disabled for dev)
+- **Build**: tsup for backend, Vite for frontend, multi-stage Docker builds
+- **Backend imports require `.js` extensions** (non-Nuxt TypeScript project)
 
 ## API Endpoints
 
@@ -34,23 +52,18 @@ npm run dev
 | PUT    | /api/links/:id  | JWT  | Update a link                     |
 | DELETE | /api/links/:id  | JWT  | Delete a link                     |
 
-### Authentication
+## Key Files
 
-POST `/api/auth/login` with `{ "username": "admin", "password": "admin123" }` to get a JWT token.
-
-Use the token in subsequent requests: `Authorization: Bearer <token>`
-
-### Link Object
-
-Links support any custom attributes (dynamic Elasticsearch mapping). Required field: `url`. Auto-generated fields:
-`position`, `created_at`, `updated_at`.
-
-## Architecture
-
-- **Backend**: Express + TypeScript, JWT auth, bcrypt password hashing
-- **Database**: Elasticsearch 8.13.2 (single-node, security disabled for dev)
-- **Containerization**: Multi-stage Docker build, docker-compose orchestration
-- **Data Persistence**: Named Docker volume (`esdata`) for Elasticsearch data
+- `backend/src/main.ts` — Entry point, starts server after ES init + admin seed
+- `backend/src/app.ts` — Express app factory (cors, json, routes, error middleware)
+- `backend/src/config.ts` — JWT secret config
+- `backend/src/elastic/client.ts` — Elasticsearch client + index init
+- `backend/src/middleware/auth/` — JWT verification, admin seeding, user validation
+- `backend/src/routes/` — auth, links, debug route handlers
+- `frontend/src/main.ts` — Vue app entry
+- `frontend/src/plugins/vuetify.ts` — Vuetify config
+- `frontend/src/stores/` — Pinia stores (auth, links)
+- `frontend/src/views/` — HomePage, LoginPage, AdminPage
 
 ## Environment Variables
 
@@ -59,3 +72,15 @@ Links support any custom attributes (dynamic Elasticsearch mapping). Required fi
 | ELASTICSEARCH_URL | http://localhost:9200 | Elasticsearch connection URL |
 | JWT_SECRET        | dev_secret            | Secret for JWT signing       |
 | PORT              | 3001                  | Backend server port          |
+| VITE_API_URL      | http://localhost:3001/api | Frontend API base URL    |
+
+## Default Credentials
+
+- Username: `admin`
+- Password: `admin123`
+
+## Testing
+
+- Backend tests use Node.js built-in test runner with supertest
+- Test file: `backend/tests/api.test.ts`
+- Run: `cd backend && npm test`
