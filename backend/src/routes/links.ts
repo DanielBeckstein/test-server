@@ -11,7 +11,7 @@ router.get("/", async (_req: AuthRequest, res: Response) => {
     index: "links",
     body: {
       query: { match_all: {} },
-      sort: [{ position: { order: "asc" } }],
+      sort: [{ position: { order: "asc", unmapped_type: "long" } }],
     },
     size: 1000,
   })
@@ -34,7 +34,7 @@ router.post("/", auth_middleware, async (req: AuthRequest, res: Response) => {
     index: "links",
     body: {
       query: { match_all: {} },
-      sort: [{ position: { order: "desc" } }],
+      sort: [{ position: { order: "desc", unmapped_type: "long" } }],
     },
     size: 1,
   })
