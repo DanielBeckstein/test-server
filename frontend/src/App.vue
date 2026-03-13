@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth"
-import { useRouter } from "vue-router"
+import {useAuthStore} from "@/stores/auth"
+import {useRouter} from "vue-router"
 
 let auth = useAuthStore()
 let router = useRouter()
@@ -32,7 +32,7 @@ function logout() {
     </v-app-bar>
 
     <v-main>
-      <router-view />
+      <router-view/>
     </v-main>
   </v-app>
 </template>
@@ -43,6 +43,7 @@ function logout() {
   border-color: white;
   color: white;
 }
+
 .logout-btn {
   margin-right: 1em;
 }

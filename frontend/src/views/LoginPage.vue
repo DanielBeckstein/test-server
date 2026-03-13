@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue"
-import { useRouter, useRoute } from "vue-router"
-import { useAuthStore } from "@/stores/auth"
-import type { VForm } from "vuetify/components"
+import {ref} from "vue"
+import {useRouter, useRoute} from "vue-router"
+import {useAuthStore} from "@/stores/auth"
+import type {VForm} from "vuetify/components"
 
 let auth = useAuthStore()
 let router = useRouter()
@@ -19,7 +19,7 @@ let rules = {
 }
 
 async function handle_submit() {
-  let { valid } = await form_ref.value!.validate()
+  let {valid} = await form_ref.value!.validate()
   if (!valid) return
 
   submitting.value = true
@@ -50,25 +50,25 @@ async function handle_submit() {
 
             <v-form ref="form_ref" @submit.prevent="handle_submit">
               <v-text-field
-                v-model="username"
-                label="Username"
-                :rules="[rules.required]"
-                prepend-inner-icon="mdi-account"
-                class="mb-2"
+                  v-model="username"
+                  label="Username"
+                  :rules="[rules.required]"
+                  prepend-inner-icon="mdi-account"
+                  class="mb-2"
               />
               <v-text-field
-                v-model="password"
-                label="Password"
-                type="password"
-                :rules="[rules.required]"
-                prepend-inner-icon="mdi-lock"
-                class="mb-4"
+                  v-model="password"
+                  label="Password"
+                  type="password"
+                  :rules="[rules.required]"
+                  prepend-inner-icon="mdi-lock"
+                  class="mb-4"
               />
               <v-btn
-                type="submit"
-                color="primary"
-                block
-                :loading="submitting"
+                  type="submit"
+                  color="primary"
+                  block
+                  :loading="submitting"
               >
                 Login
               </v-btn>

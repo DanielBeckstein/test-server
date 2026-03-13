@@ -1,3 +1,3 @@
-import { AuthRequest } from "../middleware/jwt"
+import {AuthRequest} from "../middleware/jwt"
 
 export type MyAuthRequest = AuthRequest<{ id: string }>

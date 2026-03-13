@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
-import { useLinksStore, type Link } from "@/stores/links"
+import {ref, onMounted} from "vue"
+import {useLinksStore, type Link} from "@/stores/links"
 import LinkForm from "@/components/LinkForm.vue"
 
 let store = useLinksStore()
@@ -11,9 +11,9 @@ let editing_link = ref<Link | null>(null)
 let deleting_id = ref<string | null>(null)
 
 let headers = [
-  { title: "URL", key: "url" },
-  { title: "Title", key: "title" },
-  { title: "Actions", key: "actions", sortable: false, align: "end" as const },
+  {title: "URL", key: "url"},
+  {title: "Title", key: "title"},
+  {title: "Actions", key: "actions", sortable: false, align: "end" as const},
 ]
 
 onMounted(() => {
@@ -66,11 +66,11 @@ async function confirm_delete() {
     </v-row>
 
     <v-data-table
-      :headers="headers"
-      :items="store.links"
-      :loading="store.loading"
-      item-value="id"
-      hide-default-footer
+        :headers="headers"
+        :items="store.links"
+        :loading="store.loading"
+        item-value="id"
+        hide-default-footer
     >
       <template #item.actions="{ item }">
         <v-icon class="mr-2" @click="open_edit(item)">mdi-pencil</v-icon>
@@ -84,9 +84,9 @@ async function confirm_delete() {
 
     <v-dialog v-model="dialog" max-width="640">
       <LinkForm
-        :link="editing_link"
-        @save="handle_save"
-        @cancel="dialog = false"
+          :link="editing_link"
+          @save="handle_save"
+          @cancel="dialog = false"
       />
     </v-dialog>
 
@@ -94,7 +94,7 @@ async function confirm_delete() {
       <v-card title="Confirm Delete">
         <v-card-text>This action cannot be undone.</v-card-text>
         <v-card-actions>
-          <v-spacer />
+          <v-spacer/>
           <v-btn @click="dialog_delete = false">Cancel</v-btn>
           <v-btn color="error" @click="confirm_delete">Delete</v-btn>
         </v-card-actions>

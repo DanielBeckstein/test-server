@@ -26,13 +26,13 @@ npm run dev
 
 ## API Endpoints
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | /api/auth/login | No | Login, returns JWT token |
-| GET | /api/links | No | List all links sorted by position |
-| POST | /api/links | JWT | Create a new link |
-| PUT | /api/links/:id | JWT | Update a link |
-| DELETE | /api/links/:id | JWT | Delete a link |
+| Method | Endpoint        | Auth | Description                       |
+|--------|-----------------|------|-----------------------------------|
+| POST   | /api/auth/login | No   | Login, returns JWT token          |
+| GET    | /api/links      | No   | List all links sorted by position |
+| POST   | /api/links      | JWT  | Create a new link                 |
+| PUT    | /api/links/:id  | JWT  | Update a link                     |
+| DELETE | /api/links/:id  | JWT  | Delete a link                     |
 
 ### Authentication
 
@@ -42,7 +42,8 @@ Use the token in subsequent requests: `Authorization: Bearer <token>`
 
 ### Link Object
 
-Links support any custom attributes (dynamic Elasticsearch mapping). Required field: `url`. Auto-generated fields: `position`, `created_at`, `updated_at`.
+Links support any custom attributes (dynamic Elasticsearch mapping). Required field: `url`. Auto-generated fields:
+`position`, `created_at`, `updated_at`.
 
 ## Architecture
 
@@ -53,8 +54,8 @@ Links support any custom attributes (dynamic Elasticsearch mapping). Required fi
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
+| Variable          | Default               | Description                  |
+|-------------------|-----------------------|------------------------------|
 | ELASTICSEARCH_URL | http://localhost:9200 | Elasticsearch connection URL |
-| JWT_SECRET | dev_secret | Secret for JWT signing |
-| PORT | 3001 | Backend server port |
+| JWT_SECRET        | dev_secret            | Secret for JWT signing       |
+| PORT              | 3001                  | Backend server port          |
