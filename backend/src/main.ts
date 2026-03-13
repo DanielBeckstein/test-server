@@ -1,5 +1,5 @@
 import {init_indices} from "./elastic/client.js"
-import {seed_admin} from "./seed.js"
+import {seed_admin} from "./middleware/auth/seed_admin.js"
 import {create_app} from "./app.js"
 
 let app = create_app()

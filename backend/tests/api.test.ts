@@ -3,7 +3,7 @@ import assert from "node:assert/strict"
 import request from "supertest"
 import {create_app} from "../src/app.js"
 import {client, init_indices} from "../src/elastic/client.js"
-import {seed_admin} from "../src/seed.js"
+import {seed_admin} from "../src/middleware/auth/seed_admin.js"
 
 let app = create_app()
 

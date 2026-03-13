@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt"
-import {client} from "./elastic/client"
+import {client} from "../../elastic/client.js"
 
 export async function seed_admin() {
     let result = await client.search({

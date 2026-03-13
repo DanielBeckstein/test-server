@@ -1,6 +1,6 @@
 import {Router, Response} from "express"
 import {client} from "../elastic/client"
-import {auth_middleware, AuthRequest} from "../middleware/jwt"
+import {auth_middleware, AuthRequest} from "../middleware/auth/jwt.js"
 import {ApiError} from "../middleware/error"
 import {MyAuthRequest} from "./types"
 
