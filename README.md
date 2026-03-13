@@ -8,11 +8,43 @@
 
 ## Commands
 
-**Docker:**
+### Run it fully in Docker (all 3 services: Elasticsearch, backend, frontend)
 
 ```bash
-docker-compose up        # Start all services (ES on 9200, backend on 3001, frontend on 3000)
+docker compose up        # Start all services (ES on 9200, backend on 3001, frontend on 3000)
+
+docker compose up --build --force-recreate # Force rebuild without caching after local changes
 ```
+
+### Run it locally for development
+
+1. Only launch Elasticsearch service in Docker
+
+```bash
+docker compose up elasticsearch
+```
+
+2. Start backend
+
+**Backend Development (from `/backend/`):**
+
+```bash
+cd backend
+npm install              # Install dependencies
+npm run dev              # Start dev server with tsx watch (port 3001)
+```
+
+3. Start frontend
+
+**Frontend Development (from `/frontend/`):**
+
+```bash
+cd frontend
+npm install              # Install dependencies
+npm run dev              # Start Vite dev server (port 3000)
+```
+
+### Overview of all npm commands
 
 **Backend Development (from `/backend/`):**
 
@@ -67,12 +99,12 @@ npm run preview          # Preview production build
 
 ## Environment Variables
 
-| Variable          | Default               | Description                  |
-|-------------------|-----------------------|------------------------------|
-| ELASTICSEARCH_URL | http://localhost:9200 | Elasticsearch connection URL |
-| JWT_SECRET        | dev_secret            | Secret for JWT signing       |
-| PORT              | 3001                  | Backend server port          |
-| VITE_API_URL      | http://localhost:3001/api | Frontend API base URL    |
+| Variable          | Default                   | Description                  |
+|-------------------|---------------------------|------------------------------|
+| ELASTICSEARCH_URL | http://localhost:9200     | Elasticsearch connection URL |
+| JWT_SECRET        | dev_secret                | Secret for JWT signing       |
+| PORT              | 3001                      | Backend server port          |
+| VITE_API_URL      | http://localhost:3001/api | Frontend API base URL        |
 
 ## Default Credentials
 
