@@ -7,16 +7,29 @@ import {seed_admin} from "../src/seed.js"
 
 let app = create_app()
 
+let admin = {
+    username: "admin",
+    password: "admin123",
+}
+
 async function login(): Promise<string> {
     let res = await request(app)
         .post("/api/auth/login")
-        .send({username: "admin", password: "admin123"})
+        .send(admin)
     return res.body.token
+}
+
+let token: string
+
+
+function request_as_admin() {
+    return request.agent(app).use((req) => req.set("Authorization", "Bearer " + token))
 }
 
 before(async () => {
     await init_indices()
     await seed_admin()
+    token = await login()
 })
 
 after(async () => {
@@ -29,9 +42,10 @@ after(async () => {
 
 describe("POST /api/auth/login", () => {
     test("login with valid credentials", async () => {
+
         let res = await request(app)
             .post("/api/auth/login")
-            .send({username: "admin", password: "admin123"})
+            .send(admin)
 
         assert.equal(res.status, 200)
         assert.equal(typeof res.body.token, "string")
@@ -65,41 +79,24 @@ describe("GET /api/links", () => {
     })
 })
 
-describe("POST /api/links", () => {
-    test("rejects without auth token", async () => {
-        let res = await request(app)
-            .post("/api/links")
-            .send({url: "https://example.com"})
-
-        assert.equal(res.status, 401)
-    })
-})
-
-describe("PUT /api/links/:id", () => {
-    test("rejects without auth token", async () => {
-        let res = await request(app)
-            .put("/api/links/some-id")
-            .send({url: "https://updated.com"})
-
-        assert.equal(res.status, 401)
-    })
-})
-
-describe("DELETE /api/links/:id", () => {
-    test("rejects without auth token", async () => {
-        let res = await request(app)
-            .delete("/api/links/some-id")
-
-        assert.equal(res.status, 401)
-    })
+describe("Protected routes reject without auth", () => {
+    let cases = [
+        {method: "post" as const, path: "/api/links", body: {url: "https://example.com"}},
+        {method: "put" as const, path: "/api/links/some-id", body: {url: "https://updated.com"}},
+        {method: "delete" as const, path: "/api/links/some-id"},
+    ]
+    for (let c of cases) {
+        test(c.method.toUpperCase() + " " + c.path, async () => {
+            let res = await request(app)[c.method](c.path).send(c.body || {})
+            assert.equal(res.status, 401)
+        })
+    }
 })
 
 describe("Links CRUD - authenticated", () => {
     test("create link", async () => {
-        let token = await login()
-        let res = await request(app)
+        let res = await request_as_admin()
             .post("/api/links")
-            .set("Authorization", "Bearer " + token)
             .send({url: "https://create-test.com", title: "Create Test"})
 
         assert.equal(res.status, 201)
@@ -112,10 +109,8 @@ describe("Links CRUD - authenticated", () => {
     })
 
     test("create link without url returns 400", async () => {
-        let token = await login()
-        let res = await request(app)
+        let res = await request_as_admin()
             .post("/api/links")
-            .set("Authorization", "Bearer " + token)
             .send({title: "No URL"})
 
         assert.equal(res.status, 400)
@@ -123,18 +118,14 @@ describe("Links CRUD - authenticated", () => {
     })
 
     test("update link", async () => {
-        let token = await login()
-
-        let create_res = await request(app)
+        let create_res = await request_as_admin()
             .post("/api/links")
-            .set("Authorization", "Bearer " + token)
             .send({url: "https://update-test.com", title: "Before Update"})
 
         let id = create_res.body.id
 
-        let update_res = await request(app)
+        let update_res = await request_as_admin()
             .put("/api/links/" + id)
-            .set("Authorization", "Bearer " + token)
             .send({title: "After Update"})
 
         assert.equal(update_res.status, 200)
@@ -144,29 +135,22 @@ describe("Links CRUD - authenticated", () => {
     })
 
     test("delete link", async () => {
-        let token = await login()
-
-        let create_res = await request(app)
+        let create_res = await request_as_admin()
             .post("/api/links")
-            .set("Authorization", "Bearer " + token)
             .send({url: "https://delete-test.com", title: "To Delete"})
 
         let id = create_res.body.id
 
-        let delete_res = await request(app)
+        let delete_res = await request_as_admin()
             .delete("/api/links/" + id)
-            .set("Authorization", "Bearer " + token)
 
         assert.equal(delete_res.status, 200)
         assert.deepEqual(delete_res.body, {deleted: true})
     })
 
     test("full CRUD flow", async () => {
-        let token = await login()
-
-        let create_res = await request(app)
+        let create_res = await request_as_admin()
             .post("/api/links")
-            .set("Authorization", "Bearer " + token)
             .send({url: "https://crud-flow.com", title: "CRUD Flow"})
 
         assert.equal(create_res.status, 201)
@@ -177,18 +161,16 @@ describe("Links CRUD - authenticated", () => {
         assert.ok(found)
         assert.equal(found.title, "CRUD Flow")
 
-        await request(app)
+        await request_as_admin()
             .put("/api/links/" + id)
-            .set("Authorization", "Bearer " + token)
             .send({title: "CRUD Updated"})
 
         let list_after_update = await request(app).get("/api/links")
         let updated = list_after_update.body.find((l: { id: string }) => l.id === id)
         assert.equal(updated.title, "CRUD Updated")
 
-        await request(app)
+        await request_as_admin()
             .delete("/api/links/" + id)
-            .set("Authorization", "Bearer " + token)
 
         let list_after_delete = await request(app).get("/api/links")
         let deleted = list_after_delete.body.find((l: { id: string }) => l.id === id)
