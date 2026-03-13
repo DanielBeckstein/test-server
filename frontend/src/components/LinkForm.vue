@@ -2,6 +2,7 @@
 import {ref, watch} from "vue"
 import type {Link} from "@/stores/links"
 import type {VForm} from "vuetify/components"
+import {reserved_keys} from "@/lib/constants"
 
 let props = defineProps<{ link: Link | null }>()
 let emit = defineEmits<{
@@ -20,9 +21,6 @@ let title = ref("")
 let icon = ref("")
 let description = ref("")
 let attributes = ref<Attr[]>([])
-
-// DB-managed fields that shouldn't appear as editable custom attributes
-let reserved_keys = new Set(["id", "url", "title", "icon", "category", "description", "position", "created_at", "updated_at"])
 
 let rules = {
   required: (v: string) => !!v || "Required",
