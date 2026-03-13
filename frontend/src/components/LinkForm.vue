@@ -21,6 +21,7 @@ let icon = ref("")
 let description = ref("")
 let attributes = ref<Attr[]>([])
 
+// DB-managed fields that shouldn't appear as editable custom attributes
 let reserved_keys = new Set(["id", "url", "title", "icon", "category", "description", "position", "created_at", "updated_at"])
 
 let rules = {

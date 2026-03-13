@@ -27,6 +27,7 @@ async function handle_submit() {
 
   try {
     await auth.login(username.value, password.value)
+    // Fall back to /admin if no redirect was captured by the route guard
     let redirect = (route.query.redirect as string) || "/admin"
     router.push(redirect)
   } catch (err: any) {

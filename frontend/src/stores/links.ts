@@ -2,10 +2,11 @@ import {defineStore} from "pinia"
 import {ref} from "vue"
 import {api} from "@/lib/axios"
 
+// CRUD store for the link collection — keeps local state in sync after each API call
 export interface Link {
     id: string
     url: string
-
+    // Index signature allows arbitrary custom attributes per link
     [key: string]: unknown
 }
 

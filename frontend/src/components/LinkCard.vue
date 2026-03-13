@@ -3,6 +3,7 @@ import type {Link} from "@/stores/links"
 
 let props = defineProps<{ link: Link }>()
 
+// DB-managed fields — only user-defined attributes get rendered as chips
 let reserved_keys = new Set(["id", "url", "title", "icon", "category", "description", "position", "created_at", "updated_at"])
 
 function get_custom_attrs(link: Link): Array<{ key: string; value: unknown }> {

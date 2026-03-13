@@ -2,6 +2,7 @@ import {defineStore} from "pinia"
 import {ref, computed} from "vue"
 import {api} from "@/lib/axios"
 
+// Auth state with localStorage persistence so sessions survive page reloads
 export let useAuthStore = defineStore("auth", () => {
     let token = ref<string | null>(localStorage.getItem("token"))
     let is_authenticated = computed(() => !!token.value)

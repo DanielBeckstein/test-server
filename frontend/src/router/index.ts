@@ -1,3 +1,4 @@
+// App routing with auth guard — unauthenticated users get redirected to login
 import {createRouter, createWebHistory} from "vue-router"
 import {useAuthStore} from "@/stores/auth"
 
@@ -14,6 +15,7 @@ let router = createRouter({
     ],
 })
 
+// Preserve the originally requested path so login can redirect back after success
 router.beforeEach((to) => {
     let auth = useAuthStore()
     if (to.meta.requires_auth && !auth.is_authenticated) {

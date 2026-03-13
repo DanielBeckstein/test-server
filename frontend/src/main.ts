@@ -1,3 +1,4 @@
+// App bootstrap — order matters: Pinia before Router since route guards use stores
 import {createApp} from "vue"
 import {createPinia} from "pinia"
 import {vuetify} from "./plugins/vuetify"
