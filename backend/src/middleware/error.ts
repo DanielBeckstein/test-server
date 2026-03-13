@@ -9,6 +9,7 @@ export class ApiError extends Error {
     }
 }
 
+// Express requires all 4 params to recognize this as an error handler
 export function error_middleware(err: Error, _req: Request, res: Response, _next: NextFunction) {
     if (err instanceof ApiError) {
         console.error("[ApiError " + err.status_code + "] " + err.message)

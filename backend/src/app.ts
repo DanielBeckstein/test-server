@@ -11,10 +11,12 @@ export function create_app() {
     app.use(cors())
     app.use(express.json())
 
+    // --- Route registration ---
     app.use("/api/auth", auth_router)
     app.use("/api/links", links_router)
     app.use("/api/debug", debug_router)
 
+    // Must be registered last to catch errors from all routes above
     app.use(error_middleware)
 
     return app

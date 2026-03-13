@@ -16,6 +16,7 @@ export async function validate_user(username: string, password: string): Promise
         },
     })
 
+    // Use generic "Invalid credentials" to avoid leaking whether username exists
     let hit = result.hits.hits[0]
     if (!hit) {
         throw new ApiError(401, "Invalid credentials")

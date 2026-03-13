@@ -14,7 +14,8 @@ export function auth_middleware(req: AuthRequest, _res: Response, next: NextFunc
         throw new ApiError(401, "Unauthorized")
     }
 
-    let token = header.slice(7)
+    // Remove "Bearer " prefix to get the raw JWT
+    let token = header.replace("Bearer ", "")
 
     try {
         req.user = jwt.verify(token, jwt_secret) as jwt.JwtPayload

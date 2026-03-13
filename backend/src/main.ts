@@ -5,6 +5,7 @@ import {create_app} from "./app.js"
 let app = create_app()
 let port = parseInt(process.env.PORT || "3001")
 
+// Elasticsearch indices and seed data must exist before accepting requests
 async function start() {
     await init_indices()
     await seed_admin()

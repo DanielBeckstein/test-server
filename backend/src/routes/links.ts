@@ -7,10 +7,12 @@ import {MyAuthRequest} from "./types"
 let router = Router()
 let index = "links"
 
+// Flattens ES hit structure into a flat object with id at top level
 function hit_to_link(hit: { _id?: string; _source?: unknown }) {
     return {id: hit._id, ...hit._source as Record<string, unknown>}
 }
 
+// Uses ES aggregation to find highest position for appending new links at the end
 async function get_max_position(): Promise<number> {
     let result = await client.search({
         index,
@@ -26,11 +28,13 @@ async function get_max_position(): Promise<number> {
     return aggs?.max_position?.value || 0
 }
 
+// --- CRUD route handlers ---
 router.get("/", async (_req: Request, res: Response) => {
     let result = await client.search({
         index,
         body: {
             query: {match_all: {}},
+            // unmapped_type prevents errors when position field doesn't exist yet
             sort: [{position: {order: "asc", unmapped_type: "long"}}],
         },
         size: 1000,
@@ -56,6 +60,7 @@ router.post("/", auth_middleware, async (req: AuthRequest, res: Response) => {
         updated_at: now,
     }
 
+    // refresh: true makes the doc immediately searchable (at cost of performance)
     let result = await client.index({
         index,
         body: doc,

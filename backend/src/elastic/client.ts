@@ -4,6 +4,7 @@ let es_url = process.env.ELASTICSEARCH_URL || "http://localhost:9200"
 
 export let client = new Client({node: es_url})
 
+// Ensures required indices exist on startup — safe to call repeatedly
 export async function init_indices() {
     let indices = ["links", "users"]
 
