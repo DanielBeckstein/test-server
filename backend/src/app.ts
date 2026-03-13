@@ -2,6 +2,7 @@ import express from "express"
 import cors from "cors"
 import auth_router from "./routes/auth.js"
 import links_router from "./routes/links.js"
+import debug_router from "./routes/debug.js"
 import {error_middleware} from "./middleware/error.js"
 
 export function create_app() {
@@ -12,6 +13,7 @@ export function create_app() {
 
     app.use("/api/auth", auth_router)
     app.use("/api/links", links_router)
+    app.use("/api/debug", debug_router)
 
     app.use(error_middleware)
 

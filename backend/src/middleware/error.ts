@@ -11,6 +11,7 @@ export class ApiError extends Error {
 
 export function error_middleware(err: Error, _req: Request, res: Response, _next: NextFunction) {
     if (err instanceof ApiError) {
+        console.error("[ApiError " + err.status_code + "] " + err.message)
         res.status(err.status_code).json({error: err.message})
         return
     }
