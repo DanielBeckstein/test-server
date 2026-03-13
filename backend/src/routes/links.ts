@@ -1,14 +1,34 @@
-import {Router, Response} from "express"
+import {Router, Request, Response} from "express"
 import {client} from "../elastic/client"
 import {auth_middleware, AuthRequest} from "../middleware/auth/jwt.js"
 import {ApiError} from "../middleware/error"
 import {MyAuthRequest} from "./types"
 
 let router = Router()
+let index = "links"
 
-router.get("/", async (_req: AuthRequest, res: Response) => {
+function hit_to_link(hit: { _id?: string; _source?: unknown }) {
+    return {id: hit._id, ...hit._source as Record<string, unknown>}
+}
+
+async function get_max_position(): Promise<number> {
     let result = await client.search({
-        index: "links",
+        index,
+        size: 0,
+        body: {
+            aggs: {
+                max_position: {max: {field: "position"}},
+            },
+        },
+    })
+
+    let aggs = result.aggregations as Record<string, {value: number | null}>
+    return aggs?.max_position?.value || 0
+}
+
+router.get("/", async (_req: Request, res: Response) => {
+    let result = await client.search({
+        index,
         body: {
             query: {match_all: {}},
             sort: [{position: {order: "asc", unmapped_type: "long"}}],
@@ -16,10 +36,7 @@ router.get("/", async (_req: AuthRequest, res: Response) => {
         size: 1000,
     })
 
-    let links = result.hits.hits.map((hit) => {
-        return {id: hit._id, ...hit._source as Record<string, unknown>}
-    })
-
+    let links = result.hits.hits.map(hit_to_link)
     res.json(links)
 })
 
@@ -30,21 +47,7 @@ router.post("/", auth_middleware, async (req: AuthRequest, res: Response) => {
         throw new ApiError(400, "url is required")
     }
 
-    let max_result = await client.search({
-        index: "links",
-        body: {
-            query: {match_all: {}},
-            sort: [{position: {order: "desc", unmapped_type: "long"}}],
-        },
-        size: 1,
-    })
-
-    let max_position = 0
-    if (max_result.hits.hits.length > 0) {
-        let source = max_result.hits.hits[0]._source as Record<string, unknown>
-        max_position = (source.position as number) || 0
-    }
-
+    let max_position = await get_max_position()
     let now = new Date().toISOString()
     let doc = {
         ...body,
@@ -54,12 +57,13 @@ router.post("/", auth_middleware, async (req: AuthRequest, res: Response) => {
     }
 
     let result = await client.index({
-        index: "links",
+        index,
         body: doc,
         refresh: true,
     })
 
-    res.status(201).json({id: result._id, ...doc})
+    let link = {id: result._id, ...doc}
+    res.status(201).json(link)
 })
 
 router.put("/:id", auth_middleware, async (req: MyAuthRequest, res: Response) => {
@@ -70,25 +74,27 @@ router.put("/:id", auth_middleware, async (req: MyAuthRequest, res: Response) =>
     let doc = {...body, updated_at: now}
 
     await client.update({
-        index: "links",
+        index,
         id,
         body: {doc},
         refresh: true,
     })
 
-    res.json({id, ...doc})
+    let link = {id, ...doc}
+    res.json(link)
 })
 
 router.delete("/:id", auth_middleware, async (req: MyAuthRequest, res: Response) => {
     let {id} = req.params
 
     await client.delete({
-        index: "links",
+        index,
         id,
         refresh: true,
     })
 
-    res.json({deleted: true})
+    let response = {deleted: true}
+    res.json(response)
 })
 
 export default router
